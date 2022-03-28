@@ -103,6 +103,49 @@ def is_royal(cards):
     return False
 
 
+def score_combo(combo):
+    """ 
+    function score_combo checks a 5 card combo and gives it a score
+
+    returns int score
+    param1 cards: cards in the combo
+    """
+    flush = is_flush(combo)
+    straight = is_straight(combo)
+
+    if flush and straight:
+        royal = is_royal(combo)
+        # spade royal flush
+        if royal and combo[0][0] == 'S':
+            return 10
+
+        # royal flush
+        elif royal:
+            return 9
+
+        # straight flush
+        else:
+            return 8
+
+    # four pair
+    elif is_four_pair(combo):
+        return 7
+
+    # full house
+    elif is_full_house(combo):
+        return 6
+
+    # plain flush
+    elif flush:
+        return 5
+
+    # plain straight
+    elif straight:
+        return 4
+
+    return 1
+
+
 def generate_card_pool():
     """
     function generate_card_pool enumerates all possible cards in the game
@@ -188,7 +231,21 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
         base_combos.append(winner_cards + [card])
         base_combos.append(winner_cards + [x for x in first_three_community_cards if x != card])
 
-    
+    # check (and optionally supplement combos from pool) for straight, flush etc
+    for combo in base_combos:
+
+        if len(combo) == 5:
+            # return any cards if there is a royal flush already on the table
+            if is_flush(combo) and is_straight(combo):
+                if is_royal(combo) and combo[0][0] == 'S':
+                    return [card_pool[0], card_pool[1]]
+
+        # supplement with 1 card
+        elif len(combo) == 4:
+            for card in card_pool:
+                combo_sup1 = combo.append(card)
+
+
 
    
 
