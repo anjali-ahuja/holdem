@@ -1,6 +1,7 @@
 
 import csv
 
+# dict to store numeric values of ranks
 rank_value = {"a": 14, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "j": 11, "q": 12, "k": 13 }
 
 def is_flush(cards):
@@ -34,6 +35,31 @@ def is_straight(cards):
         prev += 1
 
     return True
+
+def is_full_house(cards):
+    """
+    function is_flush checks if the given cards create a full_house
+
+    returns: boolean answer
+    param1: a list of cards to check for a full_house
+    """
+
+    if len((set(cards))) != 2:
+        return False
+    
+    sorted_ranks = sorted([rank_value[card[1:]] for card in cards])
+
+    prev = sorted_ranks[0]
+    match_len = 1
+    for rank in sorted_ranks[1:]:
+        if rank == prev:
+            match_len += 1
+        else:
+            if match_len == 2 or match_len == 3:
+                return True
+
+    return False
+
 
 def generate_card_pool():
     """
@@ -125,7 +151,7 @@ def main():
     the_winner = "David"
     
     #make_the_winner(player_csv_file, first_three_community_cards, the_winner)
-    print(is_straight(['S10', 'Sk', 'Sj', 'Sq', 'Sa']))
+    print(is_full_house(['Sa', 'S10', 'S9', 'S10', 'Sa']))
 
     return
     
