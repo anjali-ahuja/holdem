@@ -1,5 +1,33 @@
 import csv
 
+def has_potential_flush(cards):
+    """
+    function has_potential_flush checks if in out of given cards, there are atleast 3 of the same suit
+
+    returns: (suit of flush, a list of all cards that qualify for the flush)
+    param1: a list of cards to check for flush
+    """
+    flush = []
+    suits = dict()
+    suit = ""
+
+    for card in cards:
+        if card[0] in suits.keys():
+            suits[card[0]].append(card)
+        else:
+            suits[card[0]] = [card]
+    
+    max = 0
+    for k,v in suits.items():
+        if len(v) > max:
+            max = len(v)
+            suit = k
+
+    if max >= 3:
+        return (suit, suits[suit])
+    return (None, [])
+
+
 def generate_card_pool():
     """
     function generate_card_pool enumerates all possible cards in the game
@@ -81,7 +109,6 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
     
     # ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY A PLAYER
     # (that no one already has a Spade Royal Flush)
-    print(card_pool)
 
     return
 
@@ -94,7 +121,8 @@ def main():
     first_three_community_cards = ['S10', 'D1', 'Cj']
     the_winner = "David"
 
-    make_the_winner(player_csv_file, first_three_community_cards, the_winner)
+    # make_the_winner(player_csv_file, first_three_community_cards, the_winner)
+    print(has_potential_flush(['H2', 'S3', 'S4', 'D5', 'H6']))
 
 if __name__ == "__main__":
     main()
