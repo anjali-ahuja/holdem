@@ -1,56 +1,24 @@
+
 import csv
+from tracemalloc import start
 
-def has_potential_flush(cards):
+rank_value = {"a": 14, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "j": 11, "q": 12, "k": 13 }
+
+def is_flush(cards):
     """
-    function has_potential_flush checks if in out of given cards, there are atleast 3 of the same suit
+    function is_flush checks if the given cards create a flush
 
-    returns: (suit of flush, a list of all cards that qualify for the flush)
+    returns: boolean answer
     param1: a list of cards to check for flush
     """
-    flush = []
-    suits = dict()
-    suit = ""
+    suit = cards[0][0]
 
     for card in cards:
-        if card[0] in suits.keys():
-            suits[card[0]].append(card)
-        else:
-            suits[card[0]] = [card]
-    
-    max = 0
-    for k,v in suits.items():
-        if len(v) > max:
-            max = len(v)
-            suit = k
+        if card[0] != suit:
+            return False
 
-    if max >= 3:
-        return (suit, suits[suit])
-    return (None, [])
+    return True
 
-def has_potential_straight(cards):
-    """
-    function has_potential_flush checks if in out of given cards, there is a chance of a 5-run with upto 2 cards missing
-
-    returns: a list of cards in the run
-    param1: a list of cards to check for a run
-    """
-    #sort cards
-    sorted_cards = []
-
-    # iterate till smallest suit reached
-    i = 0
-    for rank in ["2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a"]:
-        #lambda function to extract rank
-        for x in map(lambda n: n[1], cards):
-
-            if x == rank:
-                break
-            else:
-                i += 1
-    
-
-
-    return cards
 
 
 def generate_card_pool():
@@ -99,6 +67,8 @@ def read_game_csv(players_csv_file, the_winner, card_pool):
             card_pool.remove(row["Card1"])
             card_pool.remove(row["Card2"])
 
+        
+
     return (winner_cards, other_cards, card_pool)
 
 
@@ -122,16 +92,12 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
     # read game csv
     winner_cards, other_cards, card_pool = read_game_csv(players_csv_file, the_winner, card_pool)
 
-    # remove community cards from card pools and consider them as a part of everyone's hands
+    # remove community cards from card pools 
     for card in first_three_community_cards:
         card_pool.remove(card)
-        winner_cards.append(card)
-        for player in other_cards.keys():
-            other_cards[player].append(card)
     
     # ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY A PLAYER
     # (that no one already has a Spade Royal Flush)
-    print(card_pool)
 
     return
 
@@ -144,7 +110,10 @@ def main():
     first_three_community_cards = ['S10', 'Da', 'Cj']
     the_winner = "David"
     
-    make_the_winner(player_csv_file, first_three_community_cards, the_winner)
+    #make_the_winner(player_csv_file, first_three_community_cards, the_winner)
+    print(is_flush(['S2', 'S8', 'Sj', 'Sq', 'S9']))
+
+    return
     
 
 if __name__ == "__main__":
