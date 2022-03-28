@@ -59,6 +59,7 @@ def is_full_house(cards):
         else:
             if match_len == 2 or match_len == 3:
                 return True
+            match_len = 1
 
     return False
 
@@ -85,9 +86,81 @@ def is_four_pair(cards):
         else:
             if match_len == 1 or match_len == 4:
                 return True
+            match_len = 1
 
     return False
 
+def is_three_pair(cards):
+    """
+    function is_flush checks if the given cards create a three_pair
+
+    returns: boolean answer
+    param1: a list of cards to check for a three_pair
+    """
+
+    sorted_ranks = sorted([rank_value[card[1:]] for card in cards])
+
+    # check if the repeated ranks occur 3 times
+    prev = sorted_ranks[0]
+    match_len = 1
+    for rank in sorted_ranks[1:]:
+        if rank == prev:
+            match_len += 1
+        else:
+            if match_len == 3:
+                return True
+            match_len = 1
+
+    return False
+
+def is_two_pair(cards):
+    """
+    function is_flush checks if the given cards create a two_pair
+
+    returns: boolean answer
+    param1: a list of cards to check for a two_pair
+    """
+    sorted_ranks = sorted([rank_value[card[1:]] for card in cards])
+
+    # lazy return if the number of unique ranks is not 3
+    if len((set(sorted_ranks))) != 3:
+        return False
+
+    # check if the repeated ranks occur 1 or 4 times
+    prev = sorted_ranks[0]
+    match_len = 1
+    for rank in sorted_ranks[1:]:
+        if rank == prev:
+            match_len += 1
+        else:
+            if match_len == 3:
+                return False
+            match_len = 1
+
+    return False
+
+def is_pair(cards):
+    """
+    function is_flush checks if the given cards create a pair
+
+    returns: boolean answer
+    param1: a list of cards to check for a pair
+    """
+
+    sorted_ranks = sorted([rank_value[card[1:]] for card in cards])
+
+    # check if the repeated ranks occur 2 times
+    prev = sorted_ranks[0]
+    match_len = 1
+    for rank in sorted_ranks[1:]:
+        if rank == prev:
+            match_len += 1
+        else:
+            if match_len == 2:
+                return True
+            match_len = 1
+
+    return False
 
 def is_royal(cards):
     """
@@ -107,7 +180,7 @@ def score_combo(combo):
     """ 
     function score_combo checks a 5 card combo and gives it a score
 
-    returns int score
+    returns score
     param1 cards: cards in the combo
     """
     flush = is_flush(combo)
@@ -143,7 +216,20 @@ def score_combo(combo):
     elif straight:
         return 4
 
-    return 1
+    # three pair
+    elif is_three_pair(combo):
+        return 3
+    
+    # 2 pairs
+    elif is_two_pair(combo):
+        return 2
+     
+    #pair
+    elif is_pair(combo):
+        return 1
+
+    # return score based on highest rank
+    return (max([rank_value[card[1:]] for card in combo])/14)
 
 
 def generate_card_pool():
@@ -226,24 +312,31 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
     # assumes there is a chance for us to win
 
     # base combinations of hand cards and community cards
-    base_combos = [winner_cards + first_three_community_cards]
+    base_combos = []
     for card in first_three_community_cards:
         base_combos.append(winner_cards + [card])
-        base_combos.append(winner_cards + [x for x in first_three_community_cards if x != card])
 
-    # check (and optionally supplement combos from pool) for straight, flush etc
+    #  supplement combos from pool and score
     for combo in base_combos:
 
-        if len(combo) == 5:
-            # return any cards if there is a royal flush already on the table
-            if is_flush(combo) and is_straight(combo):
-                if is_royal(combo) and combo[0][0] == 'S':
-                    return [card_pool[0], card_pool[1]]
+        for card1 in card_pool:
+            remaining_pool = card_pool.remove(card1)
 
-        # supplement with 1 card
-        elif len(combo) == 4:
-            for card in card_pool:
-                combo_sup1 = combo.append(card)
+            for card2 in remaining_pool:
+
+                complete_combo = combo.extend([card1, card2])
+
+                winner_score = score_combo(complete_combo)
+
+                other_scores = [score_combo(other_combo.extend([card1, card2])) for other_combo in other_cards]
+
+                if winner_score > max(other_scores):
+                    return [card1, card2]
+                    
+
+        
+                
+                
 
 
 
