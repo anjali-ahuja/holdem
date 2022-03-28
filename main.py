@@ -1,22 +1,31 @@
 import csv
 
 def generate_card_pool():
+    """
+    function generate_card_pool enumerates all possible cards in the game
 
-    card_pool = set()
+    returns: a dictionary of all cards against their suit and rank value
+    """
+
+    card_pool = dict()
 
     for suit in [("S",4), ("H", 3), ("D", 2), ("C", 1)]:
         for rank in [("a",14), ("2",2), ("3", 3), ("4", 4), ("5", 5), ("6", 6), ("7", 7), ("8", 8), ("9", 9), ("10", 10), ("j", 11), ("q", 12), ("k", 13)]: 
-            card = suit[0]+rank[0]
+            card = suit[0] + rank[0]
+            suit_value = suit[1]
             rank_value = rank[1]
-            suit_vale = suit[1]
+            card_pool[card] = (suit_value, rank_value)
 
-def read_game_csv(players_csv_file, the_winner):
+    return card_pool
+
+def read_game_csv(players_csv_file, the_winner, card_pool):
     """
     function read_game_csv reads the given csv and extracts the cards for all players
 
-    returns: 2-tuple (cards of the winner, cards of other players)
+    returns: 3-tuple (cards of the winner, cards of other players, remaining card pool)
     param1 players_csv_file: location of the CSV file with the hands of all players
     param2 the_winner: name of the player we want to make the winner
+    param3 card_pool: cards that have not been dealt yet
     """
 
     # read the provided csv and extract data
@@ -36,13 +45,19 @@ def read_game_csv(players_csv_file, the_winner):
             else:
                 other_cards[row["Player"]] = [row["Card1"], row["Card2"]]
 
-    return (winner_cards, other_cards)
+            # remove these cards from the the card_pool
+            card_pool.pop(row["Card1"], None)
+            card_pool.pop(row["Card2"], None)
+
+    return (winner_cards, other_cards, card_pool)
 
 
 def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
 
     """
     function make_the_winner finds the two cards needed for a given player to become the winner
+    ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY A PLAYER
+    (that no one already has a Spade Royal Flush)
 
     returns: array of two cards
     param1 players_csv_file: location of the CSV file with the hands of all players
@@ -50,17 +65,33 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
     param3 the_winner: name of the player we want to make the winner
     """
 
-    print(read_game_csv(players_csv_file, the_winner))
+    # init card pool
+    all_cards = generate_card_pool()
+    card_pool = all_cards
+
+    # read game csv
+    winner_cards, other_cards, card_pool = read_game_csv(players_csv_file, the_winner, card_pool)
+
+    # remove community cards from card pools and consider them as a part of everyone's hands
+    for card in first_three_community_cards:
+        card_pool.pop(card, None)
+        winner_cards.append(card)
+        for player in other_cards.keys():
+            other_cards[player].append(card)
+    
+    # ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY A PLAYER
+    # (that no one already has a Spade Royal Flush)
+    print(card_pool)
 
     return
 
 
 def main():
-    print("Hello KPMG!")
+    print("Hello Code Reviewer!")
     
     # change params here
     player_csv_file = 'tests\\test1.csv'
-    first_three_community_cards = []
+    first_three_community_cards = ['S10', 'D1', 'Cj']
     the_winner = "David"
 
     make_the_winner(player_csv_file, first_three_community_cards, the_winner)
