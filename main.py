@@ -27,22 +27,45 @@ def has_potential_flush(cards):
         return (suit, suits[suit])
     return (None, [])
 
+def has_potential_straight(cards):
+    """
+    function has_potential_flush checks if in out of given cards, there is a chance of a 5-run with upto 2 cards missing
+
+    returns: a list of cards in the run
+    param1: a list of cards to check for a run
+    """
+    #sort cards
+    sorted_cards = []
+
+    # iterate till smallest suit reached
+    i = 0
+    for rank in ["2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a"]:
+        #lambda function to extract rank
+        for x in map(lambda n: n[1], cards):
+
+            if x == rank:
+                break
+            else:
+                i += 1
+    
+
+
+    return cards
+
 
 def generate_card_pool():
     """
     function generate_card_pool enumerates all possible cards in the game
 
-    returns: a dictionary of all cards against their suit and rank value
+    returns: returns a list of all cards
     """
 
-    card_pool = dict()
+    card_pool = []
 
-    for suit in [("S",4), ("H", 3), ("D", 2), ("C", 1)]:
-        for rank in [("a",14), ("2",2), ("3", 3), ("4", 4), ("5", 5), ("6", 6), ("7", 7), ("8", 8), ("9", 9), ("10", 10), ("j", 11), ("q", 12), ("k", 13)]: 
-            card = suit[0] + rank[0]
-            suit_value = suit[1]
-            rank_value = rank[1]
-            card_pool[card] = (suit_value, rank_value)
+    for suit in "SHDC":
+        for rank in ["a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k"]: 
+            card = suit + rank
+            card_pool.append(card)
 
     return card_pool
 
@@ -60,7 +83,6 @@ def read_game_csv(players_csv_file, the_winner, card_pool):
     with open(players_csv_file, mode='r') as csv_file:
 
         csv_reader = csv.DictReader(csv_file)
-        line_count = 0
         winner_cards = []
         other_cards = dict()
 
@@ -74,8 +96,8 @@ def read_game_csv(players_csv_file, the_winner, card_pool):
                 other_cards[row["Player"]] = [row["Card1"], row["Card2"]]
 
             # remove these cards from the the card_pool
-            card_pool.pop(row["Card1"], None)
-            card_pool.pop(row["Card2"], None)
+            card_pool.remove(row["Card1"])
+            card_pool.remove(row["Card2"])
 
     return (winner_cards, other_cards, card_pool)
 
@@ -102,13 +124,14 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
 
     # remove community cards from card pools and consider them as a part of everyone's hands
     for card in first_three_community_cards:
-        card_pool.pop(card, None)
+        card_pool.remove(card)
         winner_cards.append(card)
         for player in other_cards.keys():
             other_cards[player].append(card)
     
     # ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY A PLAYER
     # (that no one already has a Spade Royal Flush)
+    print(card_pool)
 
     return
 
@@ -118,11 +141,11 @@ def main():
     
     # change params here
     player_csv_file = 'tests\\test1.csv'
-    first_three_community_cards = ['S10', 'D1', 'Cj']
+    first_three_community_cards = ['S10', 'Da', 'Cj']
     the_winner = "David"
-
-    # make_the_winner(player_csv_file, first_three_community_cards, the_winner)
-    print(has_potential_flush(['H2', 'S3', 'S4', 'D5', 'H6']))
+    
+    make_the_winner(player_csv_file, first_three_community_cards, the_winner)
+    
 
 if __name__ == "__main__":
     main()
