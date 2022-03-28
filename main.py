@@ -87,7 +87,20 @@ def is_four_pair(cards):
                 return True
 
     return False
-    
+
+
+def is_royal(cards):
+    """
+    function is_royal checks if the given STRAIGHT is royal
+
+    returns: boolean answer
+    param1: a list of cards(straight) is royal
+    """   
+    for card in cards:
+        if card[1] == 'a':
+            return True
+        
+    return False
 
 
 def generate_card_pool():
@@ -145,7 +158,7 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
 
     """
     function make_the_winner finds the two cards needed for a given player to become the winner
-    ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY A PLAYER
+    ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY ANOTHER PLAYER
     (that no one already has a Spade Royal Flush)
 
     returns: array of two cards
@@ -165,8 +178,21 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
     for card in first_three_community_cards:
         card_pool.remove(card)
     
-    # ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY A PLAYER
+    # ASSUMES THERE HAS BEEN A CHECK FOR GAME ALREADY BEING WON BY ANOTHER PLAYER
     # (that no one already has a Spade Royal Flush)
+    # assumes there is a chance for us to win
+
+    # base combinations of hand cards and community cards
+    base_combos = [winner_cards + first_three_community_cards]
+    for card in first_three_community_cards:
+        base_combos.append(winner_cards + [card])
+        base_combos.append(winner_cards + [x for x in first_three_community_cards if x != card])
+
+    
+
+   
+
+        
 
     return
 
@@ -179,8 +205,7 @@ def main():
     first_three_community_cards = ['S10', 'Da', 'Cj']
     the_winner = "David"
     
-    #make_the_winner(player_csv_file, first_three_community_cards, the_winner)
-    print(is_four_pair(['S10', 'S10', 'Sa', 'S10', 'S10']))
+    make_the_winner(player_csv_file, first_three_community_cards, the_winner)
 
     return
     
