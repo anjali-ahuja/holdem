@@ -44,11 +44,13 @@ def is_full_house(cards):
     param1: a list of cards to check for a full_house
     """
 
-    if len((set(cards))) != 2:
-        return False
-    
     sorted_ranks = sorted([rank_value[card[1:]] for card in cards])
 
+    # lazy return if the number of unique ranks is not 2
+    if len((set(sorted_ranks))) != 2:
+        return False
+    
+    # check if the repeated ranks occur 2 or 3 times
     prev = sorted_ranks[0]
     match_len = 1
     for rank in sorted_ranks[1:]:
@@ -59,6 +61,9 @@ def is_full_house(cards):
                 return True
 
     return False
+
+
+
 
 
 def generate_card_pool():
