@@ -1,6 +1,5 @@
 
 import csv
-from tracemalloc import start
 
 rank_value = {"a": 14, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "j": 11, "q": 12, "k": 13 }
 
@@ -19,7 +18,22 @@ def is_flush(cards):
 
     return True
 
+def is_straight(cards):
+    """
+    function is_flush checks if the given cards create a straight
 
+    returns: boolean answer
+    param1: a list of cards to check for straight
+    """
+    sorted_ranks = sorted([rank_value[card[1:]] for card in cards])
+
+    prev = sorted_ranks[0]
+    for rank in sorted_ranks[1:]:
+        if rank != prev + 1:
+            return False
+        prev += 1
+
+    return True
 
 def generate_card_pool():
     """
@@ -111,7 +125,7 @@ def main():
     the_winner = "David"
     
     #make_the_winner(player_csv_file, first_three_community_cards, the_winner)
-    print(is_flush(['S2', 'S8', 'Sj', 'Sq', 'S9']))
+    print(is_straight(['S10', 'Sk', 'Sj', 'Sq', 'Sa']))
 
     return
     
