@@ -1,5 +1,6 @@
 
 import csv
+from itertools import combinations
 
 # dict to store numeric values of ranks
 rank_value = {"a": 14, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "j": 11, "q": 12, "k": 13 }
@@ -320,31 +321,22 @@ def make_the_winner(players_csv_file, first_three_community_cards, the_winner):
     for combo in base_combos:
 
         for card1 in card_pool:
-            remaining_pool = card_pool.remove(card1)
+            remaining_pool = [card for card in card_pool if card != card1]
 
             for card2 in remaining_pool:
 
-                complete_combo = combo.extend([card1, card2])
+                complete_combo = combo + [card1, card2]
 
                 winner_score = score_combo(complete_combo)
 
-                other_scores = [score_combo(other_combo.extend([card1, card2])) for other_combo in other_cards]
+                other_extras = combinations([card1, card2] + first_three_community_cards, 2)
+                other_scores = []
+                for extra in other_extras:
+                    other_scores = other_scores + [score_combo(other_combo + list(extra)) for other_combo in other_cards.values()]
 
                 if winner_score > max(other_scores):
                     return [card1, card2]
-                    
-
-        
-                
-                
-
-
-
-   
-
-        
-
-    return
+    return [card_pool[0], card_pool[1]]
 
 
 def main():
@@ -355,7 +347,7 @@ def main():
     first_three_community_cards = ['S10', 'Da', 'Cj']
     the_winner = "David"
     
-    make_the_winner(player_csv_file, first_three_community_cards, the_winner)
+    print(make_the_winner(player_csv_file, first_three_community_cards, the_winner))
 
     return
     
