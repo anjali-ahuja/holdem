@@ -62,8 +62,32 @@ def is_full_house(cards):
 
     return False
 
+def is_four_pair(cards):
+    """
+    function is_flush checks if the given cards create a four_pair
 
+    returns: boolean answer
+    param1: a list of cards to check for a four_pair
+    """
 
+    sorted_ranks = sorted([rank_value[card[1:]] for card in cards])
+
+    # lazy return if the number of unique ranks is not 2
+    if len((set(sorted_ranks))) != 2:
+        return False
+
+    # check if the repeated ranks occur 1 or 4 times
+    prev = sorted_ranks[0]
+    match_len = 1
+    for rank in sorted_ranks[1:]:
+        if rank == prev:
+            match_len += 1
+        else:
+            if match_len == 1 or match_len == 4:
+                return True
+
+    return False
+    
 
 
 def generate_card_pool():
@@ -156,7 +180,7 @@ def main():
     the_winner = "David"
     
     #make_the_winner(player_csv_file, first_three_community_cards, the_winner)
-    print(is_full_house(['Sa', 'S10', 'S9', 'S10', 'Sa']))
+    print(is_four_pair(['S10', 'S10', 'Sa', 'S10', 'S10']))
 
     return
     
